@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Piano Tablature Studio | Code Journey Labs</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Outfit:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS Custom Properties & Base Variables */
+    :root {
+      --bg-color: #0b0f19;
+      --panel-bg: #111827;
+      --border-color: #1f2937;
+      --accent-color: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.4);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --success-color: #10b981;
+      --error-color: #ef4444;
+      
+      /* Sheet Themes */
+      --sheet-paper-bg: #ffffff;
+      --sheet-paper-text: #000000;
+      --sheet-paper-border: transparent;
+      --sheet-paper-accent: #111827;
+      --sheet-paper-muted: #4b5563;
+      --sheet-paper-bar: #d1d5db;
+
+      --sheet-studio-bg: #090d16;
+      --sheet-studio-text: #e0e6ed;
+      --sheet-studio-border: #1a2333;
+      --sheet-studio-accent: #38bdf8;
+      --sheet-studio-muted: #64748b;
+      --sheet-studio-bar: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Header Styling */
+    header {
+      background-color: var(--panel-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      z-index: 10;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .logo-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-badge {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-dashboard {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-dashboard:hover {
+      border-color: var(--accent-color);
+      color: var(--text-main);
+    }
+
+    /* Main Container */
+    .studio-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+    }
+
+    /* Left Pane - JSON Editor */
+    .editor-pane {
+      width: 40%;
+      min-width: 400px;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      background-color: #0e1320;
+    }
+
+    .pane-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--panel-bg);
+    }
+
+    .pane-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preset-select {
+      background-color: #0b0f19;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      width: 180px;
+      transition: border-color 0.2s;
+    }
+
+    .preset-select:focus {
+      border-color: var(--accent-color);
+    }
+
+    .editor-area-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .json-textarea {
+      flex: 1;
+      width: 100%;
+      background-color: #090c15;
+      color: #38bdf8;
+      border: none;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      padding: 20px;
+      resize: none;
+      outline: none;
+      line-height: 1.6;
+    }
+
+    .pane-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border-color);
+      background-color: var(--panel-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .editor-privacy-note {
+      padding: 10px 20px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      background-color: rgba(0, 0, 0, 0.15);
+      text-align: center;
+      line-height: 1.5;
+      font-family: inherit;
+    }
+
+    .alpha-banner {
+      padding: 10px 20px;
+      font-size: 11px;
+      color: #cbd5e1;
+      border-top: 1px solid var(--border-color);
+      background-color: rgba(99, 102, 241, 0.08);
+      text-align: center;
+      line-height: 1.5;
+      font-family: inherit;
+    }
+
+    /* Collapsible Rules Styling */
+    .rules-accordion {
+      border-top: 1px solid var(--border-color);
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    
+    .rules-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background-color 0.2s;
+    }
+    
+    .rules-header:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .rules-header .arrow {
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+    
+    .rules-header.expanded .arrow {
+      transform: rotate(180deg);
+    }
+    
+    .rules-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease-out, padding 0.25s ease-out;
+      padding: 0 20px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .rules-content.expanded {
+      max-height: 420px;
+      padding: 15px 20px 20px 20px;
+      overflow-y: auto;
+    }
+    
+    .rules-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .rules-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+    }
+    
+    .rules-item-title {
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+    
+    .rules-sublist {
+      margin-left: 12px;
+      margin-top: 4px;
+      list-style-type: circle;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .boundary-rule {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #fbd38d;
+    }
+    
+    .boundary-title {
+      font-weight: 700;
+      color: #f59e0b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .status-badge.valid {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+    }
+
+    .status-badge.invalid {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error-color);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background-color: #1f2937;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background-color: #374151;
+      border-color: var(--text-muted);
+    }
+
+    .btn-action.primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-action.primary:hover {
+      background-color: #4f46e5;
+    }
+
+    /* Right Pane - Piano Tab Sheet View */
+    .preview-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .controls-toolbar {
+      padding: 14px 24px;
+      background-color: var(--panel-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toolbar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Transpose Control Styling */
+    .transpose-control {
+      display: flex;
+      align-items: center;
+      background-color: #0b0f19;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .btn-transpose {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: background-color 0.2s;
+    }
+
+    .btn-transpose:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .transpose-value {
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 48px;
+      text-align: center;
+      color: var(--accent-color);
+    }
+
+    /* Style Switcher */
+    .style-switch {
+      display: flex;
+      background-color: #0b0f19;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 2px;
+    }
+
+    .btn-style {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-style.active {
+      background-color: var(--accent-color);
+      color: white;
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Font adjust */
+    .font-size-adjust {
+      display: flex;
+      background-color: #0b0f19;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .btn-font-size {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background-color 0.2s;
+    }
+
+    .btn-font-size:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Piano Container */
+    .piano-section {
+      background-color: #0a0e17;
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .piano-keyboard-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      height: 120px;
+    }
+
+    .piano-keyboard {
+      width: 100%;
+      height: 100%;
+    }
+
+    .piano-key {
+      cursor: pointer;
+      transition: fill 0.1s, filter 0.2s;
+    }
+
+    .piano-key.white {
+      fill: #ffffff;
+      stroke: #d1d5db;
+      stroke-width: 1;
+    }
+
+    .piano-key.white:hover {
+      fill: #f3f4f6;
+    }
+
+    .piano-key.black {
+      fill: #1f2937;
+      stroke: #111827;
+      stroke-width: 1;
+      z-index: 2;
+    }
+
+    .piano-key.black:hover {
+      fill: #374151;
+    }
+
+    /* Interactive highlights */
+    .piano-key.highlight-chord {
+      fill: #6366f1 !important;
+      filter: drop-shadow(0 0 4px var(--accent-glow));
+    }
+
+    .piano-key.highlight-pos {
+      fill: #10b981 !important;
+      filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.5));
+    }
+
+    .piano-key.highlight-note {
+      fill: #f59e0b !important;
+      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
+    }
+
+    .piano-key.active-press {
+      fill: #ec4899 !important;
+    }
+
+    .piano-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .legend-color.chord { background-color: #6366f1; }
+    .legend-color.pos { background-color: #10b981; }
+    .legend-color.note { background-color: #f59e0b; }
+
+    /* Sheet Viewer container */
+    .sheet-viewer {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      transition: background-color 0.3s;
+    }
+
+    /* Default Theme: Manuscript Paper (Georgia Serif) */
+    .sheet-viewer.manuscript {
+      background-color: #ffffff;
+    }
+
+    .sheet-container {
+      width: 100%;
+      max-width: 820px;
+      min-height: 100%;
+      background-color: var(--sheet-paper-bg);
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 20px 0px;
+      color: var(--sheet-paper-text);
+      font-family: 'Georgia', serif;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    /* Studio Neon Mode */
+    .sheet-viewer.studio-neon {
+      background-color: #06090f;
+    }
+
+    .sheet-viewer.studio-neon .sheet-container {
+      background-color: var(--sheet-studio-bg);
+      border-color: var(--sheet-studio-border);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      color: var(--sheet-studio-text);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Sizing options */
+    .sheet-container.font-sm { font-size: 13px; }
+    .sheet-container.font-md { font-size: 15px; }
+    .sheet-container.font-lg { font-size: 17px; }
+
+    /* Sheet Components */
+    .sheet-header {
+      border-bottom: 2px solid var(--sheet-paper-border);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.3s;
+    }
+
+    .sheet-viewer.studio-neon .sheet-header {
+      border-color: var(--sheet-studio-border);
+    }
+
+    .sheet-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .sheet-viewer.studio-neon .sheet-title {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(to right, #ffffff, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sheet-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 13px;
+      font-family: 'Outfit', sans-serif;
+      color: var(--sheet-paper-muted);
+    }
+
+    .sheet-viewer.studio-neon .sheet-meta-grid {
+      color: var(--sheet-studio-muted);
+    }
+
+    .meta-value {
+      font-weight: 600;
+      color: var(--sheet-paper-text);
+    }
+
+    .sheet-viewer.studio-neon .meta-value {
+      color: var(--sheet-studio-text);
+    }
+
+    .transpose-indicator {
+      font-size: 12px;
+      color: var(--sheet-paper-accent);
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .sheet-viewer.studio-neon .transpose-indicator {
+      color: var(--sheet-studio-accent);
+    }
+
+    /* Sections */
+    .sheet-section {
+      margin-bottom: 35px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      border-bottom: 1px dashed var(--sheet-paper-border);
+      padding-bottom: 4px;
+      color: var(--sheet-paper-text);
+      letter-spacing: -0.2px;
+    }
+
+    .sheet-viewer.studio-neon .section-title {
+      border-color: var(--sheet-studio-border);
+      color: #818cf8;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Grid Line Rendering */
+    .line-container {
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Tab grid block styling */
+    .tab-grid-block {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      width: 100%;
+      background-color: transparent;
+      border: none;
+      padding: 4px 0;
+    }
+
+    .sheet-viewer.studio-neon .tab-grid-block {
+      background-color: transparent;
+      border: none;
+      padding: 4px 0;
+    }
+
+    /* The core alignment engine - CSS Grid */
+    .grid-row {
+      display: grid;
+      width: 100%;
+      position: relative;
+      min-height: 20px;
+      align-items: center;
+      user-select: none;
+    }
+
+    .grid-cell {
+      grid-column-start: var(--col);
+      white-space: pre;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+
+    /* Visual styles for roles */
+    .grid-cell.hand-pos {
+      color: #000000;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Georgia', serif;
+      cursor: help;
+    }
+    .sheet-viewer.studio-neon .grid-cell.hand-pos {
+      color: #34d399;
+    }
+
+    .grid-cell.chord {
+      color: var(--sheet-paper-text);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+    }
+    .grid-cell.chord:hover {
+      color: #6366f1 !important;
+      text-decoration: underline;
+    }
+    .sheet-viewer.studio-neon .grid-cell.chord {
+      color: #a5b4fc;
+      font-family: 'Outfit', sans-serif;
+    }
+    .sheet-viewer.studio-neon .grid-cell.chord:hover {
+      color: #38bdf8 !important;
+    }
+
+    .grid-cell.tab-note {
+      color: #000000;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Georgia', serif;
+      cursor: pointer;
+    }
+    .grid-cell.tab-note:hover {
+      color: #f59e0b !important;
+      font-weight: 700;
+    }
+    .sheet-viewer.studio-neon .grid-cell.tab-note {
+      color: #94a3b8;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .grid-cell.bar-line {
+      color: var(--sheet-paper-bar);
+      font-weight: 400;
+    }
+    .sheet-viewer.studio-neon .grid-cell.bar-line {
+      color: var(--sheet-studio-bar);
+    }
+
+    /* Lyrics block styling */
+    .lyric-row {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #000000;
+      padding: 2px 0;
+      font-family: 'Georgia', serif;
+    }
+
+    .sheet-viewer.studio-neon .lyric-row {
+      color: #cbd5e1;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .grid-cell.lyric-word {
+      font-weight: 400;
+      font-family: 'Georgia', serif;
+      font-size: 15px;
+      color: #000000;
+    }
+    .sheet-viewer.studio-neon .grid-cell.lyric-word {
+      color: #cbd5e1;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Raw monospace text mode */
+    .monospace-view {
+      display: none;
+      width: 100%;
+      background-color: var(--sheet-paper-bg);
+      border: 1px solid var(--sheet-paper-border);
+      color: var(--sheet-paper-text);
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 13px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .sheet-viewer.studio-neon .monospace-view {
+      background-color: var(--sheet-studio-bg);
+      border-color: var(--sheet-studio-border);
+      color: #a7f3d0; /* nice green hue */
+    }
+
+    .sheet-viewer.raw-text .sheet-container {
+      display: none;
+    }
+
+    .sheet-viewer.raw-text .monospace-view {
+      display: block;
+      max-width: 820px;
+    }
+
+    /* Promo Ad */
+    .ad-promo-box {
+      margin: 20px 20px 0 20px;
+      padding: 16px;
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    .ad-promo-img {
+      width: 70px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    .ad-promo-content {
+      flex: 1;
+    }
+    .ad-promo-title {
+      color: #f8fafc;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .ad-promo-text {
+      color: #cbd5e1;
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .ad-promo-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .ad-promo-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    @media print {
+      .ad-promo-box { display: none !important; }
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+        overflow: visible !important;
+        height: auto !important;
+      }
+      header, .editor-pane, .controls-toolbar, .piano-section, .pane-footer, .nav-actions {
+        display: none !important;
+      }
+      .studio-container {
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .preview-pane {
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .sheet-viewer {
+        background: white !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+      .sheet-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        color: black !important;
+        background: white !important;
+      }
+      .tab-grid-block {
+        background: transparent !important;
+        border: none !important;
+        padding: 4px 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Studio Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">P</div>
+      <div class="logo-title">Piano Tablature Studio</div>
+      <div class="logo-badge">LABS</div>
+    </div>
+    <div class="nav-actions">
+      <a href="https://github.com/codejourneysoftware/piano-tablature" class="btn-dashboard" target="_blank">View on GitHub</a>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="studio-container">
+    
+    <!-- Left Panel: JSON Editor -->
+    <div class="editor-pane">
+      <div class="pane-header">
+        <div class="pane-title">
+          <span>JSON Schema Input</span>
+        </div>
+        <div class="preset-title" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
+          Preset: <strong>Twinkle, Twinkle, Little Star</strong>
+        </div>
+        <select id="preset-select" class="preset-select" style="display: none;">
+          <option value="twinkle_star">Twinkle, Twinkle, Little Star</option>
+        </select>
+      </div>
+
+      <div class="editor-area-container">
+        <textarea id="json-textarea" class="json-textarea" spellcheck="false"></textarea>
+      </div>
+
+      <div class="pane-footer">
+        <div id="validation-badge" class="status-badge valid">Valid JSON</div>
+        <div class="editor-actions">
+          <button id="btn-refresh" class="btn-action primary">Render</button>
+          <button id="btn-format" class="btn-action">Format</button>
+          <button id="btn-copy" class="btn-action">Copy</button>
+          <button id="btn-paste" class="btn-action">Paste</button>
+          <button id="btn-clear" class="btn-action">Clear</button>
+        </div>
+      </div>
+      <!-- Collapsible Fingering & Stretch Rules -->
+      <div class="rules-accordion">
+        <button id="btn-toggle-rules" class="rules-header">
+          <span>🎹 Fingering, Stretch & Lyric Rules</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div id="rules-content" class="rules-content">
+          <ul class="rules-list">
+            <li>
+              <div class="rules-item-title">• 5-Finger Home Base:</div>
+              <div style="font-size: 11px; margin-top: 2px;"><code>5</code> = Root (lowest), <code>4</code> = +2, <code>3</code> = +4, <code>2</code> = +5, <code>1</code> = +7 (highest semitone)</div>
+            </li>
+            <li>
+              <div class="rules-item-title">• Chromatic Accidentals:</div>
+              <div style="font-size: 11px; margin-top: 2px;">Append <code>#</code> (sharp +1 semitone) or <code>b</code> (flat -1 semitone)</div>
+            </li>
+            <li>
+              <div class="rules-item-title">• Hand Stretches (Capped at ±2):</div>
+              <ul class="rules-sublist" style="font-size: 11px;">
+                <li>Append <code>+</code> (stretch up +1) or <code>++</code> (stretch up +2)</li>
+                <li>Append <code>-</code> (stretch down -1) or <code>--</code> (stretch down -2)</li>
+              </ul>
+            </li>
+            <li>
+              <div class="rules-item-title" style="color: #60a5fa;">• The Cross vs. The Stretch:</div>
+              <ul class="rules-sublist" style="font-size: 11px;">
+                <li><strong>The Stretch:</strong> Reaching a finger slightly outward while keeping the hand in the same position (use <code>+</code>, <code>++</code>, <code>-</code>, <code>--</code>).</li>
+                <li><strong>The Cross:</strong> Pivoting your hand (thumb under or fingers over) to move smoothly up/down. Digitally represented by inserting a new Hand Pos marker (e.g. <code>G Pos</code>) in the grid to shift your home base.</li>
+              </ul>
+            </li>
+            <li>
+              <div class="rules-item-title">• Multiple Lyric Verses:</div>
+              <div style="font-size: 11px; margin-top: 2px;">To display multiple verses sharing the same chords and fingering, pass a 2D array of arrays to the <code>"lyrics"</code> property (e.g., <code>"lyrics": [ [ { "text": "Verse 1 lyrics", "col": 0 } ], [ { "text": "Verse 2 lyrics", "col": 0 } ] ]</code>).</div>
+            </li>
+            <li class="boundary-rule" style="margin-top: 4px;">
+              <div class="boundary-title">⚠️ Boundary Rule:</div>
+              <div style="font-size: 11px;">Stretches are physically capped at 2 semitones. For further notes, enter a hand position change (e.g. <code>G Pos</code>) in the grid instead!</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="alpha-banner">
+        <strong>Early Alpha v0.1:</strong> This is an early preview release. Please send us your ideas and feedback as we develop this tool.
+      </div>
+      <div class="editor-privacy-note">
+        🔒 <strong>Local Privacy Policy:</strong> Your music is yours alone. All structured song JSON and tablature data are processed locally within your web browser. No inputs are uploaded, stored, or sent to external servers.
+      </div>
+
+
+    </div>
+
+    <!-- Right Panel: Render View -->
+    <div class="preview-pane">
+      
+      <!-- Preview controls toolbar -->
+      <div class="controls-toolbar">
+        <div class="toolbar-group">
+          <span class="toolbar-label">Transpose</span>
+          <div class="transpose-control">
+            <button id="btn-trans-down" class="btn-transpose" title="Transpose Down">-</button>
+            <span id="transpose-val" class="transpose-value">0</span>
+            <button id="btn-trans-up" class="btn-transpose" title="Transpose Up">+</button>
+          </div>
+        </div>
+
+        <div class="toolbar-group">
+          <span class="toolbar-label">Sheet Layout</span>
+          <div id="theme-switch" class="style-switch">
+            <button class="btn-style active" data-theme="manuscript">Manuscript</button>
+            <button class="btn-style" data-theme="studio-neon">Studio Dark</button>
+          </div>
+        </div>
+
+        <div class="toolbar-group">
+          <span class="toolbar-label">View</span>
+          <div id="view-switch" class="style-switch">
+            <button class="btn-style active" data-view="grid">Interactive</button>
+            <button class="btn-style" data-view="raw">Raw Text</button>
+          </div>
+        </div>
+
+        <div class="toolbar-group">
+          <span class="toolbar-label">Scale</span>
+          <div class="font-size-adjust">
+            <button id="btn-font-down" class="btn-font-size" title="Decrease Size">A-</button>
+            <button id="btn-font-up" class="btn-font-size" title="Increase Size">A+</button>
+          </div>
+        </div>
+
+        <div class="toolbar-group">
+          <button id="btn-print" class="btn-action primary">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            Print Sheet
+          </button>
+        </div>
+      </div>
+
+      <!-- Virtual Piano Visualizer Section -->
+      <div class="piano-section">
+        <div class="piano-keyboard-wrapper">
+          <svg class="piano-keyboard" viewBox="0 0 880 150" id="piano-svg">
+            <!-- SVG Piano keys will be rendered dynamically here -->
+          </svg>
+        </div>
+        <div class="piano-legend">
+          <div class="legend-item">
+            <div class="legend-color chord"></div>
+            <span>Chord Tone</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color pos"></div>
+            <span>Hand Position Scale</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color note"></div>
+            <span>Single Tab Note</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Render Area -->
+      <div id="sheet-viewer" class="sheet-viewer manuscript">
+        <div id="sheet-container" class="sheet-container font-md">
+          <!-- Dynamic grid content goes here -->
+        </div>
+        <pre id="monospace-view" class="monospace-view"></pre>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Full Application Controller logic -->
+  <script>
+    // PRESETS DATA BLOCK
+    const PRESETS = {
+      twinkle_star: `// Welcome to Piano Tablature Studio!
+// This is a structured JSON layout for
+// the classic beginner song "Twinkle, Twinkle, Little Star".
+// You can write C-style comments (//)
+// inside this JSON editor to document
+// your tabs without parsing errors.
+{
+"metadata": {
+"title": "Twinkle, Twinkle, Little Star",
+"composed_by": "Traditional / Mozart",
+"key_instructions": "Play with a steady, gentle, and clear lullaby rhythm in C Major",
+"grid_columns_per_line": 70
+},
+"sections": [
+{
+"type": "Theme - Part A",
+"lines": [
+{
+"type": "grid_line",
+"hand_positions": [
+{ "position": "C Pos", "col": 0 }
+],
+"chords": [
+{ "chord": "C", "col": 0 },
+{ "chord": "F", "col": 16 },
+{ "chord": "C", "col": 32 },
+{ "chord": "G", "col": 48 },
+{ "chord": "C", "col": 56 }
+],
+"fingering": [
+{ "finger": "1", "col": 0 },
+{ "finger": "1", "col": 4 },
+{ "finger": "5", "col": 8 },
+{ "finger": "5", "col": 12 },
+{ "finger": "6", "col": 16 },
+{ "finger": "6", "col": 20 },
+{ "finger": "5", "col": 24 },
+{ "finger": "4", "col": 32 },
+{ "finger": "4", "col": 36 },
+{ "finger": "3", "col": 40 },
+{ "finger": "3", "col": 44 },
+{ "finger": "2", "col": 48 },
+{ "finger": "2", "col": 52 },
+{ "finger": "1", "col": 56 }
+],
+"lyrics": [
+[
+{ "text": "Twin-", "col": 0 },
+{ "text": "kle,", "col": 4 },
+{ "text": "twin-", "col": 8 },
+{ "text": "kle,", "col": 12 },
+{ "text": "lit-", "col": 16 },
+{ "text": "tle", "col": 20 },
+{ "text": "star,", "col": 24 },
+{ "text": "How", "col": 32 },
+{ "text": "I", "col": 36 },
+{ "text": "won-", "col": 40 },
+{ "text": "der", "col": 44 },
+{ "text": "what", "col": 48 },
+{ "text": "you", "col": 52 },
+{ "text": "are!", "col": 56 }
+]
+]
+}
+]
+},
+{
+"type": "Theme - Part B",
+"lines": [
+{
+"type": "grid_line",
+"chords": [
+{ "chord": "C", "col": 0 },
+{ "chord": "G", "col": 16 },
+{ "chord": "C", "col": 32 },
+{ "chord": "G", "col": 48 }
+],
+"fingering": [
+{ "finger": "5", "col": 0 },
+{ "finger": "5", "col": 4 },
+{ "finger": "4", "col": 8 },
+{ "finger": "4", "col": 12 },
+{ "finger": "3", "col": 16 },
+{ "finger": "3", "col": 20 },
+{ "finger": "2", "col": 24 },
+{ "finger": "5", "col": 32 },
+{ "finger": "5", "col": 36 },
+{ "finger": "4", "col": 40 },
+{ "finger": "4", "col": 44 },
+{ "finger": "3", "col": 48 },
+{ "finger": "3", "col": 52 },
+{ "finger": "2", "col": 56 }
+],
+"lyrics": [
+[
+{ "text": "Up", "col": 0 },
+{ "text": "a-", "col": 4 },
+{ "text": "bove", "col": 8 },
+{ "text": "the", "col": 12 },
+{ "text": "world", "col": 16 },
+{ "text": "so", "col": 20 },
+{ "text": "high,", "col": 24 },
+{ "text": "Like", "col": 32 },
+{ "text": "a", "col": 36 },
+{ "text": "dia-", "col": 40 },
+{ "text": "mond", "col": 44 },
+{ "text": "in", "col": 48 },
+{ "text": "the", "col": 52 },
+{ "text": "sky.", "col": 56 }
+]
+]
+}
+]
+},
+{
+"type": "Theme - Part A (Reprise)",
+"lines": [
+{
+"type": "grid_line",
+"chords": [
+{ "chord": "C", "col": 0 },
+{ "chord": "F", "col": 16 },
+{ "chord": "C", "col": 32 },
+{ "chord": "G", "col": 48 },
+{ "chord": "C", "col": 56 }
+],
+"fingering": [
+{ "finger": "1", "col": 0 },
+{ "finger": "1", "col": 4 },
+{ "finger": "5", "col": 8 },
+{ "finger": "5", "col": 12 },
+{ "finger": "6", "col": 16 },
+{ "finger": "6", "col": 20 },
+{ "finger": "5", "col": 24 },
+{ "finger": "4", "col": 32 },
+{ "finger": "4", "col": 36 },
+{ "finger": "3", "col": 40 },
+{ "finger": "3", "col": 44 },
+{ "finger": "2", "col": 48 },
+{ "finger": "2", "col": 52 },
+{ "finger": "1", "col": 56 }
+],
+"lyrics": [
+[
+{ "text": "Twin-", "col": 0 },
+{ "text": "kle,", "col": 4 },
+{ "text": "twin-", "col": 8 },
+{ "text": "kle,", "col": 12 },
+{ "text": "lit-", "col": 16 },
+{ "text": "tle", "col": 20 },
+{ "text": "star,", "col": 24 },
+{ "text": "How", "col": 32 },
+{ "text": "I", "col": 36 },
+{ "text": "won-", "col": 40 },
+{ "text": "der", "col": 44 },
+{ "text": "what", "col": 48 },
+{ "text": "you", "col": 52 },
+{ "text": "are!", "col": 56 }
+]
+]
+}
+]
+}
+]
+}`
+    };
+
+    // CHROMATIC MUSIC SCALE & CHORD TRANSPOSITION CONSTANTS
+    const CHROMATIC_SCALE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    
+    // Normalization maps
+    const NOTE_TO_VAL = {
+      'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11
+    };
+
+    const PREFERRED_SPELLING = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+    // STATE VARIABLES
+    let currentSong = null;
+    let transposeOffset = 0;
+    let activeFontSizeClass = 'font-md'; // font-sm, font-md, font-lg
+    let activeTheme = 'manuscript'; // manuscript, studio-neon
+    let activeView = 'grid'; // grid, raw
+    let activeScalePositions = []; // track list of pitches in the active scale/position
+
+    // WEB AUDIO SYNTHESIZER
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    const NOTE_FREQS = {
+      'C3': 130.81, 'C#3': 138.59, 'Db3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'Eb3': 155.56, 'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'Gb3': 185.00, 'G3': 196.00, 'G#3': 207.65, 'Ab3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'Bb3': 233.08, 'B3': 246.94,
+      'C4': 261.63, 'C#4': 277.18, 'Db4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'Eb4': 311.13, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'Gb4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'Ab4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'Bb4': 466.16, 'B4': 493.88,
+      'C5': 523.25, 'C#5': 554.37, 'Db5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'Eb5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'Gb5': 739.99, 'G5': 783.99, 'G#5': 830.61, 'Ab5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'Bb5': 932.33, 'B5': 987.77,
+      'C6': 1046.50
+    };
+
+    // DOM ELEMENTS
+    const jsonTextarea = document.getElementById('json-textarea');
+    const presetSelect = document.getElementById('preset-select');
+    const validationBadge = document.getElementById('validation-badge');
+    const btnRefresh = document.getElementById('btn-refresh');
+    const btnFormat = document.getElementById('btn-format');
+    const btnCopy = document.getElementById('btn-copy');
+    const btnPaste = document.getElementById('btn-paste');
+    const btnClear = document.getElementById('btn-clear');
+    const btnPrint = document.getElementById('btn-print');
+    
+    const transposeValSpan = document.getElementById('transpose-val');
+    const btnTransDown = document.getElementById('btn-trans-down');
+    const btnTransUp = document.getElementById('btn-trans-up');
+    
+    const themeSwitch = document.getElementById('theme-switch');
+    const viewSwitch = document.getElementById('view-switch');
+    const btnFontDown = document.getElementById('btn-font-down');
+    const btnFontUp = document.getElementById('btn-font-up');
+    
+    const sheetViewer = document.getElementById('sheet-viewer');
+    const sheetContainer = document.getElementById('sheet-container');
+    const monospaceView = document.getElementById('monospace-view');
+    const pianoSvg = document.getElementById('piano-svg');
+
+    // INITIALIZATION
+    window.addEventListener('load', () => {
+      drawPianoKeyboard();
+      loadPreset(presetSelect.value);
+      setupEventListeners();
+    });
+
+    // EVENT LISTENERS REGISTER
+    function setupEventListeners() {
+      // JSON editor events
+      jsonTextarea.addEventListener('input', handleJsonInput);
+      btnRefresh.addEventListener('click', handleJsonInput);
+      
+      presetSelect.addEventListener('change', (e) => {
+        loadPreset(e.target.value);
+      });
+      
+      btnFormat.addEventListener('click', formatJson);
+      btnCopy.addEventListener('click', copyJsonToClipboard);
+      btnPaste.addEventListener('click', pasteJsonFromClipboard);
+      btnClear.addEventListener('click', clearJson);
+      btnPrint.addEventListener('click', () => window.print());
+      
+      // Transpose events
+      btnTransDown.addEventListener('click', () => adjustTranspose(-1));
+      btnTransUp.addEventListener('click', () => adjustTranspose(1));
+      
+      // Font scale events
+      btnFontDown.addEventListener('click', () => adjustFontSize(-1));
+      btnFontUp.addEventListener('click', () => adjustFontSize(1));
+      
+      // Theme toggling
+      themeSwitch.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-style');
+        if (!btn) return;
+        themeSwitch.querySelectorAll('.btn-style').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        setTheme(btn.dataset.theme);
+      });
+
+      // View switching
+      viewSwitch.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-style');
+        if (!btn) return;
+        viewSwitch.querySelectorAll('.btn-style').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        setViewMode(btn.dataset.view);
+      });
+
+      // Collapsible Rules Toggle
+      const btnToggleRules = document.getElementById('btn-toggle-rules');
+      const rulesContent = document.getElementById('rules-content');
+      
+      btnToggleRules.addEventListener('click', () => {
+        btnToggleRules.classList.toggle('expanded');
+        rulesContent.classList.toggle('expanded');
+      });
+    }
+
+    // CORE FUNCTIONS
+    function loadPreset(key) {
+      if (PRESETS[key]) {
+        jsonTextarea.value = PRESETS[key];
+        transposeOffset = 0;
+        transposeValSpan.innerText = '0';
+        handleJsonInput();
+      }
+    }
+
+    function formatJson() {
+      try {
+        const clean = jsonTextarea.value.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '');
+        const parsed = JSON.parse(clean);
+        jsonTextarea.value = JSON.stringify(parsed, null, 2);
+      } catch (err) {
+        // Leave unformatted if broken
+      }
+    }
+
+    function copyJsonToClipboard() {
+      jsonTextarea.select();
+      document.execCommand('copy');
+      const originalText = btnCopy.innerText;
+      btnCopy.innerText = 'Copied!';
+      setTimeout(() => btnCopy.innerText = originalText, 2000);
+    }
+
+    async function pasteJsonFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        jsonTextarea.value = text;
+        handleJsonInput();
+        const originalText = btnPaste.innerText;
+        btnPaste.innerText = 'Pasted!';
+        setTimeout(() => btnPaste.innerText = originalText, 2000);
+      } catch (err) {
+        console.error('Failed to read clipboard contents: ', err);
+        const originalText = btnPaste.innerText;
+        btnPaste.innerText = 'Error';
+        setTimeout(() => btnPaste.innerText = originalText, 2000);
+      }
+    }
+
+    function clearJson() {
+      jsonTextarea.value = '';
+      const originalText = btnClear.innerText;
+      btnClear.innerText = 'Cleared!';
+      setTimeout(() => btnClear.innerText = originalText, 2000);
+      handleJsonInput();
+    }
+
+    // Strips single-line and multi-line comments before parsing
+    function handleJsonInput() {
+      try {
+        const clean = jsonTextarea.value.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '');
+        const parsed = JSON.parse(clean);
+        currentSong = parsed;
+        validationBadge.className = 'status-badge valid';
+        validationBadge.innerText = 'Valid JSON';
+        renderSheet();
+      } catch (err) {
+        validationBadge.className = 'status-badge invalid';
+        validationBadge.innerText = 'Parse Error: ' + err.message.substring(0, 30);
+      }
+    }
+
+    function adjustTranspose(dir) {
+      transposeOffset = Math.max(-12, Math.min(12, transposeOffset + dir));
+      transposeValSpan.innerText = (transposeOffset > 0 ? '+' : '') + transposeOffset;
+      renderSheet();
+    }
+
+    function adjustFontSize(dir) {
+      const classes = ['font-sm', 'font-md', 'font-lg'];
+      let idx = classes.indexOf(activeFontSizeClass);
+      idx = Math.max(0, Math.min(classes.length - 1, idx + dir));
+      sheetContainer.classList.remove(activeFontSizeClass);
+      activeFontSizeClass = classes[idx];
+      sheetContainer.classList.add(activeFontSizeClass);
+    }
+
+    function setTheme(theme) {
+      sheetViewer.classList.remove('manuscript', 'studio-neon');
+      sheetViewer.classList.add(theme);
+      activeTheme = theme;
+    }
+
+    function setViewMode(view) {
+      sheetViewer.classList.remove('raw-text');
+      if (view === 'raw') {
+        sheetViewer.classList.add('raw-text');
+      }
+      activeView = view;
+      renderSheet();
+    }
+
+    // PIANO KEYBOARD GENERATOR SVG
+    function drawPianoKeyboard() {
+      // 3 Octaves: C3 to C6
+      // 22 White keys, 15 Black keys
+      const whiteNotes = [
+        'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3',
+        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4',
+        'C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5',
+        'C6'
+      ];
+      
+      const blackNotePitches = [
+        { afterWhiteIdx: 0, pitch: 'C#3' },
+        { afterWhiteIdx: 1, pitch: 'D#3' },
+        { afterWhiteIdx: 3, pitch: 'F#3' },
+        { afterWhiteIdx: 4, pitch: 'G#3' },
+        { afterWhiteIdx: 5, pitch: 'A#3' },
+        
+        { afterWhiteIdx: 7, pitch: 'C#4' },
+        { afterWhiteIdx: 8, pitch: 'D#4' },
+        { afterWhiteIdx: 10, pitch: 'F#4' },
+        { afterWhiteIdx: 11, pitch: 'G#4' },
+        { afterWhiteIdx: 12, pitch: 'A#4' },
+        
+        { afterWhiteIdx: 14, pitch: 'C#5' },
+        { afterWhiteIdx: 15, pitch: 'D#5' },
+        { afterWhiteIdx: 17, pitch: 'F#5' },
+        { afterWhiteIdx: 18, pitch: 'G#5' },
+        { afterWhiteIdx: 19, pitch: 'A#5' }
+      ];
+
+      pianoSvg.innerHTML = '';
+      
+      const keyWidth = 40;
+      const keyHeight = 150;
+      const blackWidth = 24;
+      const blackHeight = 90;
+      
+      // 1. Draw White Keys
+      whiteNotes.forEach((note, idx) => {
+        const x = idx * keyWidth;
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', 0);
+        rect.setAttribute('width', keyWidth);
+        rect.setAttribute('height', keyHeight);
+        rect.setAttribute('class', 'piano-key white');
+        rect.setAttribute('data-note', note);
+        rect.setAttribute('id', `key-${note.replace('#', 's')}`);
+        
+        // Listeners for manual clicking
+        rect.addEventListener('mousedown', () => pressKey(note));
+        rect.addEventListener('mouseup', () => releaseKey(note));
+        rect.addEventListener('mouseleave', () => releaseKey(note));
+        
+        pianoSvg.appendChild(rect);
+      });
+
+      // 2. Draw Black Keys overlapping
+      blackNotePitches.forEach((bn) => {
+        const x = (bn.afterWhiteIdx * keyWidth) + keyWidth - (blackWidth / 2);
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', 0);
+        rect.setAttribute('width', blackWidth);
+        rect.setAttribute('height', blackHeight);
+        rect.setAttribute('class', 'piano-key black');
+        rect.setAttribute('data-note', bn.pitch);
+        rect.setAttribute('id', `key-${bn.pitch.replace('#', 's')}`);
+        
+        rect.addEventListener('mousedown', () => pressKey(bn.pitch));
+        rect.addEventListener('mouseup', () => releaseKey(bn.pitch));
+        rect.addEventListener('mouseleave', () => releaseKey(bn.pitch));
+        
+        pianoSvg.appendChild(rect);
+      });
+    }
+
+    // AUDIO PLAY & KEY PRESS
+    function pressKey(note) {
+      const keyEl = document.getElementById(`key-${note.replace('#', 's')}`);
+      if (keyEl) keyEl.classList.add('active-press');
+      
+      const freq = NOTE_FREQS[note];
+      if (freq) playTone(freq, 0.8);
+    }
+
+    function releaseKey(note) {
+      const keyEl = document.getElementById(`key-${note.replace('#', 's')}`);
+      if (keyEl) keyEl.classList.remove('active-press');
+    }
+
+    function playTone(freq, duration = 0.8) {
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        
+        const now = audioCtx.currentTime;
+        
+        const osc1 = audioCtx.createOscillator();
+        osc1.type = 'triangle';
+        osc1.frequency.value = freq;
+        
+        const osc2 = audioCtx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.value = freq * 2;
+        
+        const gain1 = audioCtx.createGain();
+        const gain2 = audioCtx.createGain();
+        const masterGain = audioCtx.createGain();
+        
+        gain1.gain.setValueAtTime(0.12, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        
+        gain2.gain.setValueAtTime(0.03, now);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.8);
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        
+        gain1.connect(masterGain);
+        gain2.connect(masterGain);
+        
+        masterGain.connect(audioCtx.destination);
+        
+        masterGain.gain.setValueAtTime(0, now);
+        masterGain.gain.linearRampToValueAtTime(1, now + 0.02);
+        masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        
+        osc1.start(now);
+        osc2.start(now);
+        
+        osc1.stop(now + duration);
+        osc2.stop(now + duration);
+      } catch (err) {
+        console.error("Audio Synthesis error: ", err);
+      }
+    }
+
+    // CHORD TO NOTE PITCH DICTIONARY FOR VISUAL KEYBOARD HIGHLIGHTS
+    function getChordNotes(chordName) {
+      // Basic core mappings
+      const baseChords = {
+        'C': ['C4', 'E4', 'G4'],
+        'Cm': ['C4', 'Eb4', 'G4'],
+        'C7': ['C4', 'E4', 'G4', 'Bb4'],
+        'Cmaj7': ['C4', 'E4', 'G4', 'B4'],
+        'C#': ['C#4', 'F4', 'G#4'],
+        'C#m': ['C#4', 'E4', 'G#4'],
+        'C#7': ['C#4', 'F4', 'G#4', 'B4'],
+        
+        'D': ['D4', 'F#4', 'A4'],
+        'Dm': ['D4', 'F4', 'A4'],
+        'D7': ['D4', 'F#4', 'A4', 'C5'],
+        'Dmaj7': ['D4', 'F#4', 'A4', 'C#5'],
+        'Eb': ['Eb4', 'G4', 'Bb4'],
+        'E': ['E4', 'G#4', 'B4'],
+        'Em': ['E4', 'G4', 'B4'],
+        'E7': ['E4', 'G#4', 'B4', 'D5'],
+        
+        'F': ['F4', 'A4', 'C5'],
+        'Fm': ['F4', 'Ab4', 'C5'],
+        'Fmaj7': ['F4', 'A4', 'C5', 'E5'],
+        'F#': ['F#4', 'A#4', 'C#5'],
+        'F#m': ['F#4', 'A4', 'C#5'],
+        
+        'G': ['G4', 'B4', 'D5'],
+        'Gm': ['G4', 'Bb4', 'D5'],
+        'G7': ['G4', 'B4', 'D5', 'F5'],
+        'Gmaj7': ['G4', 'B4', 'D5', 'F#5'],
+        'G#': ['G#4', 'C5', 'D#5'],
+        'Ab': ['Ab4', 'C5', 'Eb5'],
+        
+        'A': ['A4', 'C#5', 'E5'],
+        'Am': ['A4', 'C5', 'E5'],
+        'A7': ['A4', 'C#5', 'E5', 'G5'],
+        'Amaj7': ['A4', 'C#5', 'E5', 'G#5'],
+        
+        'B': ['B4', 'D#5', 'F#5'],
+        'Bm': ['B4', 'D5', 'F#5'],
+        'B7': ['B4', 'D#5', 'F#5', 'A5']
+      };
+
+      // Strip transpose details and slash parts
+      let searchChord = chordName.split('/')[0].trim();
+      return baseChords[searchChord] || ['C4', 'E4', 'G4']; // Fallback triad
+    }
+
+    // POSITION HAND MAPPINGS
+    function getScaleNotesForPos(posName) {
+      const positions = {
+        'G Pos': ['G3', 'A3', 'B3', 'C4', 'D4'],
+        'GPos': ['G3', 'A3', 'B3', 'C4', 'D4'],
+        'D Pos': ['D4', 'E4', 'F#4', 'G4', 'A4'],
+        'DPos': ['D4', 'E4', 'F#4', 'G4', 'A4'],
+        'C Pos': ['C4', 'D4', 'E4', 'F4', 'G4'],
+        'CPos': ['C4', 'D4', 'E4', 'F4', 'G4']
+      };
+      return positions[posName] || [];
+    }
+
+    // MAP A NUMERIC TAB NOTE TO AN ACTUAL KEY DEPENDING ON THE ACTIVE SCALE
+    function mapTabToNotePitch(tabChar, activePos) {
+      // Default scale is G major starting on G3
+      let scale = ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4'];
+      
+      if (activePos === 'D Pos' || activePos === 'DPos') {
+        scale = ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'];
+      } else if (activePos === 'C Pos' || activePos === 'CPos') {
+        scale = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+      }
+      
+      // Clean tab label
+      let clean = tabChar.replace('#', '').replace('+', '').trim();
+      let index = parseInt(clean);
+      
+      if (isNaN(index)) return null;
+      
+      let basePitch = null;
+      if (index === 1) basePitch = scale[0];
+      else if (index === 2) basePitch = scale[1];
+      else if (index === 3) basePitch = scale[2];
+      else if (index === 4) basePitch = scale[3];
+      else if (index === 5) basePitch = scale[4];
+      else if (index === 6) basePitch = scale[5];
+      else if (index === 7) basePitch = scale[6];
+      else if (index === -1) basePitch = scale[0].replace('3', '2').replace('4', '3'); // octave lower 1
+      else if (index === -2) basePitch = scale[1].replace('3', '2').replace('4', '3'); // octave lower 2
+      
+      if (!basePitch) return null;
+      
+      // Apply accidentals/octave offsets
+      if (tabChar.includes('#')) {
+        // sharp it
+        let noteName = basePitch.substring(0, basePitch.length - 1);
+        let octave = basePitch.slice(-1);
+        basePitch = noteName + '#' + octave;
+      }
+      if (tabChar.includes('+')) {
+        // transpose up an octave
+        let octave = parseInt(basePitch.slice(-1)) + 1;
+        basePitch = basePitch.substring(0, basePitch.length - 1) + octave;
+      }
+      
+      return basePitch;
+    }
+
+    // MUSIC CHORD TRANSPOSITION MODULE
+    function transposeChord(chord, semitones) {
+      if (semitones === 0) return chord;
+      if (!chord || chord === '|' || chord === '||:' || chord === ':||') return chord;
+      
+      // Support slash chords recursively!
+      if (chord.includes('/')) {
+        return chord.split('/').map(part => transposeChord(part.trim(), semitones)).join('/');
+      }
+      
+      const chordRegex = /^([A-G][#b]?)(.*)$/;
+      const match = chord.match(chordRegex);
+      if (!match) return chord;
+      
+      const root = match[1];
+      const suffix = match[2];
+      
+      const rootVal = NOTE_TO_VAL[root];
+      if (rootVal === undefined) return chord;
+      
+      let newVal = (rootVal + semitones) % 12;
+      if (newVal < 0) newVal += 12;
+      
+      return PREFERRED_SPELLING[newVal] + suffix;
+    }
+
+    // VISUAL KEYBOARD CONTROL
+    function clearKeyboardHighlights() {
+      document.querySelectorAll('.piano-key').forEach(key => {
+        key.classList.remove('highlight-chord', 'highlight-pos', 'highlight-note');
+      });
+    }
+
+    function highlightKeyboardChord(chordName) {
+      clearKeyboardHighlights();
+      let transposed = transposeChord(chordName, transposeOffset);
+      let notes = getChordNotes(transposed);
+      notes.forEach(note => {
+        const el = document.getElementById(`key-${note.replace('#', 's')}`);
+        if (el) el.classList.add('highlight-chord');
+      });
+    }
+
+    function highlightKeyboardPosition(posName) {
+      clearKeyboardHighlights();
+      let notes = getScaleNotesForPos(posName);
+      notes.forEach(note => {
+        const el = document.getElementById(`key-${note.replace('#', 's')}`);
+        if (el) el.classList.add('highlight-pos');
+      });
+    }
+
+    function highlightKeyboardNote(noteName) {
+      clearKeyboardHighlights();
+      const el = document.getElementById(`key-${noteName.replace('#', 's')}`);
+      if (el) el.classList.add('highlight-note');
+    }
+
+    // Helper to normalize either object { "col": "val" } or array [ { "chord": "val", "col": 0 } ] formats
+    function normalizeLayer(data, valKey) {
+      const map = {};
+      if (Array.isArray(data)) {
+        data.forEach(item => {
+          if (item && item.col !== undefined) {
+            let val = undefined;
+            if (valKey && item[valKey] !== undefined) {
+              val = item[valKey];
+            } else if (item.finger !== undefined) {
+              val = item.finger;
+            } else if (item.chord !== undefined) {
+              val = item.chord;
+            } else if (item.position !== undefined) {
+              val = item.position;
+            } else if (item.text !== undefined) {
+              val = item.text;
+            } else if (item.value !== undefined) {
+              val = item.value;
+            } else if (item.val !== undefined) {
+              val = item.val;
+            }
+            if (val !== undefined) {
+              map[item.col] = String(val);
+            }
+          }
+        });
+      } else if (data && typeof data === 'object') {
+        Object.entries(data).forEach(([k, v]) => {
+          map[k] = String(v);
+        });
+      }
+      return map;
+    }
+
+    // MONOSPACE PLAIN TEXT GENERATION ENGINE
+    function generateRawMonospaceSheet(song, semitones) {
+      let output = '';
+      const cols = song.metadata.grid_columns_per_line || 70;
+      
+      output += `${song.metadata.title}\n`;
+      if (song.metadata.composed_by) {
+        output += `Composed by ${song.metadata.composed_by}\n`;
+      }
+      if (semitones !== 0) {
+        output += `(Transposed: ${semitones > 0 ? '+' : ''}${semitones} semitones)\n`;
+      }
+      output += `Instructions: ${song.metadata.key_instructions || 'None'}\n\n`;
+
+      song.sections.forEach(sec => {
+        output += `[ ${sec.type} ]\n`;
+        
+        sec.lines.forEach(line => {
+          let lineRows = [];
+          
+          const normHandPos = normalizeLayer(line.hand_positions, 'position');
+          const normChords = normalizeLayer(line.chords, 'chord');
+          const normNotes = normalizeLayer(line.fingering || line.numerics || line.tabs, 'finger');
+          
+          if (line.type === 'instrumental_grid') {
+            // Hand Positions Row
+            if (Object.keys(normHandPos).length > 0) {
+              lineRows.push(makePaddedRow(normHandPos, line.bar_lines, cols));
+            }
+            // Chords Row
+            if (Object.keys(normChords).length > 0) {
+              const transChords = {};
+              Object.entries(normChords).forEach(([k, v]) => {
+                transChords[k] = transposeChord(v, semitones);
+              });
+              lineRows.push(makePaddedRow(transChords, line.bar_lines, cols));
+            }
+            // Tabs Row
+            if (Object.keys(normNotes).length > 0) {
+              lineRows.push(makePaddedRow(normNotes, line.bar_lines, cols));
+            }
+          } else if (line.type === 'grid_line') {
+            // Chords Row
+            if (Object.keys(normChords).length > 0) {
+              const transChords = {};
+              Object.entries(normChords).forEach(([k, v]) => {
+                transChords[k] = transposeChord(v, semitones);
+              });
+              lineRows.push(makePaddedRow(transChords, null, cols));
+            }
+            // Fingering Row
+            if (Object.keys(normNotes).length > 0) {
+              lineRows.push(makePaddedRow(normNotes, null, cols));
+            }
+          }
+          
+          if (lineRows.length > 0) {
+            output += lineRows.join('\n') + '\n';
+          }
+          
+          // Lyrics
+          if (line.lyrics && line.lyrics.length > 0) {
+            const lyricLines = Array.isArray(line.lyrics[0]) ? line.lyrics : [line.lyrics];
+            lyricLines.forEach(lyricLine => {
+              if (lyricLine && lyricLine.length > 0) {
+                const hasPositions = lyricLine.some(l => l && l.hasOwnProperty('col'));
+                if (hasPositions) {
+                  const lyricMap = normalizeLayer(lyricLine, 'text');
+                  output += makePaddedRow(lyricMap, null, cols) + '\n';
+                } else {
+                  const joinedLyrics = lyricLine.map(l => l ? (l.text || '') : '').join('');
+                  output += joinedLyrics.substring(0, cols) + '\n';
+                }
+              }
+            });
+          }
+          
+          output += '\n'; // visual line spacing
+        });
+        output += '\n'; // spacing between sections
+      });
+
+      return output;
+    }
+
+    function makePaddedRow(items, barLines, width = 70) {
+      let arr = Array(width).fill(' ');
+      
+      // Inject bar lines
+      if (barLines) {
+        barLines.forEach(col => {
+          if (col < width) arr[col] = '|';
+        });
+      }
+      
+      // Inject items
+      if (items) {
+        Object.entries(items).forEach(([colStr, text]) => {
+          let col = parseInt(colStr);
+          if (isNaN(col) || col >= width) return;
+          for (let i = 0; i < text.length; i++) {
+            if (col + i < width) {
+              arr[col + i] = text[i];
+            }
+          }
+        });
+      }
+      return arr.join('').trimEnd();
+    }
+
+    // MAIN RENDER ENGINE FOR THE INTERACTIVE CSS GRID VIEW
+    function renderSheet() {
+      if (!currentSong) return;
+      
+      // If user selected raw text view, render that and return
+      if (activeView === 'raw') {
+        monospaceView.innerText = generateRawMonospaceSheet(currentSong, transposeOffset);
+        return;
+      }
+      
+      sheetContainer.innerHTML = '';
+      const cols = currentSong.metadata.grid_columns_per_line || 70;
+      
+      // 1. Title & Header
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'sheet-header';
+      
+      const titleH1 = document.createElement('h1');
+      titleH1.className = 'sheet-title';
+      titleH1.innerText = currentSong.metadata.title;
+      headerDiv.appendChild(titleH1);
+      
+      const metaGrid = document.createElement('div');
+      metaGrid.className = 'sheet-meta-grid';
+      
+      let metaHTML = `<div>Composer: <span class="meta-value">${currentSong.metadata.composed_by || 'Unknown'}</span></div>`;
+      metaHTML += `<div>Instructions: <span class="meta-value">${currentSong.metadata.key_instructions || 'Play with heart'}</span></div>`;
+      if (transposeOffset !== 0) {
+        metaHTML += `<div class="transpose-indicator">Transpose Shift: ${transposeOffset > 0 ? '+' : ''}${transposeOffset} semitones</div>`;
+      }
+      metaGrid.innerHTML = metaHTML;
+      headerDiv.appendChild(metaGrid);
+      
+      sheetContainer.appendChild(headerDiv);
+
+      // Track active hand position across the song lines to resolve dynamic scale degrees
+      let activeHandPos = 'G Pos'; 
+
+      // 2. Iterate Sections
+      currentSong.sections.forEach(section => {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'sheet-section';
+        
+        const sectionHeader = document.createElement('h2');
+        sectionHeader.className = 'section-title';
+        sectionHeader.innerText = section.type;
+        sectionDiv.appendChild(sectionHeader);
+        
+        // Iterate lines inside section
+        section.lines.forEach(line => {
+          const lineContainer = document.createElement('div');
+          lineContainer.className = 'line-container';
+          
+          const handPositionsMap = normalizeLayer(line.hand_positions, 'position');
+          const chordsMap = normalizeLayer(line.chords, 'chord');
+          const notesMap = normalizeLayer(line.fingering || line.numerics || line.tabs, 'finger');
+          
+          const hasGridBlock = Object.keys(handPositionsMap).length > 0 ||
+                               Object.keys(chordsMap).length > 0 ||
+                               Object.keys(notesMap).length > 0;
+          
+          if (hasGridBlock) {
+            const gridBlock = document.createElement('div');
+            gridBlock.className = 'tab-grid-block';
+            
+            // Hand Positions Row
+            if (Object.keys(handPositionsMap).length > 0) {
+              const row = document.createElement('div');
+              row.className = 'grid-row';
+              row.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+              
+              // Render bar lines
+              if (line.bar_lines) {
+                line.bar_lines.forEach(b => {
+                  if (b < cols) {
+                    const bar = document.createElement('span');
+                    bar.className = 'grid-cell bar-line';
+                    bar.style.setProperty('--col', b + 1);
+                    bar.innerText = '|';
+                    row.appendChild(bar);
+                  }
+                });
+              }
+              
+              Object.entries(handPositionsMap).forEach(([colStr, val]) => {
+                const col = parseInt(colStr);
+                if (col >= cols) return;
+                let text = val || '';
+                if (col + text.length > cols) {
+                  text = text.substring(0, cols - col);
+                }
+                const cell = document.createElement('span');
+                cell.className = 'grid-cell hand-pos';
+                cell.style.setProperty('--col', col + 1);
+                cell.innerText = text;
+                
+                // Track last active hand position
+                activeHandPos = val;
+                
+                // Keyboard highlights
+                cell.addEventListener('mouseenter', () => highlightKeyboardPosition(val));
+                cell.addEventListener('mouseleave', clearKeyboardHighlights);
+                
+                row.appendChild(cell);
+              });
+              gridBlock.appendChild(row);
+            }
+            
+            // Chords Row
+            if (Object.keys(chordsMap).length > 0) {
+              const row = document.createElement('div');
+              row.className = 'grid-row';
+              row.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+              
+              // Render bar lines
+              if (line.bar_lines) {
+                line.bar_lines.forEach(b => {
+                  if (b < cols) {
+                    const bar = document.createElement('span');
+                    bar.className = 'grid-cell bar-line';
+                    bar.style.setProperty('--col', b + 1);
+                    bar.innerText = '|';
+                    row.appendChild(bar);
+                  }
+                });
+              }
+              
+              Object.entries(chordsMap).forEach(([colStr, val]) => {
+                const col = parseInt(colStr);
+                if (col >= cols) return;
+                
+                const isMetaSymbol = (val === '|' || val === '||:' || val === ':||');
+                const transposedVal = isMetaSymbol ? val : transposeChord(val, transposeOffset);
+                let text = transposedVal || '';
+                if (col + text.length > cols) {
+                  text = text.substring(0, cols - col);
+                }
+                
+                const cell = document.createElement('span');
+                cell.className = `grid-cell ${isMetaSymbol ? 'bar-line' : 'chord'}`;
+                cell.style.setProperty('--col', col + 1);
+                cell.innerText = text;
+                
+                if (!isMetaSymbol) {
+                  // Interactive highlights and clicking to play audio!
+                  cell.addEventListener('mouseenter', () => highlightKeyboardChord(transposedVal));
+                  cell.addEventListener('mouseleave', clearKeyboardHighlights);
+                  cell.addEventListener('click', () => {
+                    const notes = getChordNotes(transposedVal);
+                    notes.forEach((note, index) => {
+                      const freq = NOTE_FREQS[note];
+                      if (freq) {
+                        setTimeout(() => {
+                          const keyEl = document.getElementById(`key-${note.replace('#', 's')}`);
+                          if (keyEl) {
+                            keyEl.classList.add('active-press');
+                            setTimeout(() => keyEl.classList.remove('active-press'), 400);
+                          }
+                          playTone(freq, 1.2);
+                        }, index * 40);
+                      }
+                    });
+                  });
+                }
+                
+                row.appendChild(cell);
+              });
+              gridBlock.appendChild(row);
+            }
+            
+            // Notes / Fingering Row
+            if (Object.keys(notesMap).length > 0) {
+              const row = document.createElement('div');
+              row.className = 'grid-row';
+              row.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+              
+              // Render bar lines
+              if (line.bar_lines) {
+                line.bar_lines.forEach(b => {
+                  if (b < cols) {
+                    const bar = document.createElement('span');
+                    bar.className = 'grid-cell bar-line';
+                    bar.style.setProperty('--col', b + 1);
+                    bar.innerText = '|';
+                    row.appendChild(bar);
+                  }
+                });
+              }
+              
+              Object.entries(notesMap).forEach(([colStr, val]) => {
+                const col = parseInt(colStr);
+                if (col >= cols) return;
+                let text = val || '';
+                if (col + text.length > cols) {
+                  text = text.substring(0, cols - col);
+                }
+                const cell = document.createElement('span');
+                cell.className = 'grid-cell tab-note';
+                cell.style.setProperty('--col', col + 1);
+                cell.innerText = text;
+                
+                // Resolve tab note to specific piano pitch dynamically
+                const pitch = mapTabToNotePitch(val, activeHandPos);
+                if (pitch) {
+                  cell.title = `Plays Pitch: ${pitch}`;
+                  cell.addEventListener('mouseenter', () => highlightKeyboardNote(pitch));
+                  cell.addEventListener('mouseleave', clearKeyboardHighlights);
+                  cell.addEventListener('click', () => {
+                    const keyEl = document.getElementById(`key-${pitch.replace('#', 's')}`);
+                    if (keyEl) {
+                      keyEl.classList.add('active-press');
+                      setTimeout(() => keyEl.classList.remove('active-press'), 300);
+                    }
+                    const freq = NOTE_FREQS[pitch];
+                    if (freq) playTone(freq, 0.8);
+                  });
+                }
+                
+                row.appendChild(cell);
+              });
+              gridBlock.appendChild(row);
+            }
+            
+            lineContainer.appendChild(gridBlock);
+          }
+          
+          // Lyrics row
+          if (line.lyrics && line.lyrics.length > 0) {
+            const lyricLines = Array.isArray(line.lyrics[0]) ? line.lyrics : [line.lyrics];
+            lyricLines.forEach(lyricLine => {
+              if (lyricLine && lyricLine.length > 0) {
+                const hasPositions = lyricLine.some(l => l && l.hasOwnProperty('col'));
+                if (hasPositions) {
+                  const row = document.createElement('div');
+                  row.className = 'lyric-row grid-row';
+                  row.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                  
+                  lyricLine.forEach(lyric => {
+                    if (!lyric) return;
+                    const col = lyric.col !== undefined ? parseInt(lyric.col) : 0;
+                    if (col >= cols) return;
+                    let text = lyric.text || '';
+                    if (col + text.length > cols) {
+                      text = text.substring(0, cols - col);
+                    }
+                    const cell = document.createElement('span');
+                    cell.className = 'grid-cell lyric-word';
+                    cell.style.setProperty('--col', col + 1);
+                    cell.innerText = text;
+                    row.appendChild(cell);
+                  });
+                  lineContainer.appendChild(row);
+                } else {
+                  const row = document.createElement('div');
+                  row.className = 'lyric-row';
+                  const joinedLyrics = lyricLine.map(l => l ? (l.text || '') : '').join('');
+                  row.innerText = joinedLyrics.substring(0, cols);
+                  lineContainer.appendChild(row);
+                }
+              }
+            });
+          }
+          
+          sectionDiv.appendChild(lineContainer);
+        });
+        
+        sheetContainer.appendChild(sectionDiv);
+      });
+    }
+
+  </script>
+  <!-- Open Source Footer -->
+  <footer style="text-align: center; padding: 20px; font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border-color); background-color: var(--panel-bg); z-index: 10; margin-top: auto;">
+    Open Source Project brought to you by <a href="https://www.codejourneysoftware.com" target="_blank" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">www.codejourneysoftware.com</a>
+  </footer>
+</body>
+</html>
