@@ -153,7 +153,7 @@ To execute fluid scalar runs (like a basic C Major scale), pianists rely on intr
 
 Every space in the standard must represent a strict visual time coordinate. We are currently evaluating two compact, non-breaking layout proposals to handle crossings:
 
-#### Proposal A: The Inline Pivot Token (Single Character)
+#### Possible Proposal: The Inline Pivot Token (Single Character)
 This approach embeds a single-character geometric modifier immediately following the finger number, keeping the strict column width intact.
 
 * `3<` : **Thumb-Under Cross** (The thumb ducks under finger 3).
@@ -165,6 +165,8 @@ Position: 0--------10--------20--------30--------40--------50--------60--------7
 [Hand Pos] C4 Pos                     F4 Pos
 [Melody]   1---------2---------3<--------1---------2---------3---------4---------
 [Lyrics]   Joy       to        the       world,    the       Lord      is
+```
+
 
 ---
 
