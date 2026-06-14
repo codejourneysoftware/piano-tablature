@@ -112,3 +112,7 @@ We welcome contributions of all kinds! Whether you want to help refine the parsi
 ## 📄 License
 
 This project and its specification are licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
+
+## 🎁 A Gift From Code Journey Software
+This open-source standard and its reference sandbox implementation were lovingly crafted and contributed to the global developer and music community as a free gift by Code Journey Software (http://www.codejourneysoftware.com).
+We love building beautiful, intuitive products that simplify workflows and add joy to creative journeys. If this project helps you learn, teach, or build something great, consider sharing it with a fellow musician!
