@@ -106,6 +106,217 @@ To keep text-based tabs intuitive, the standard adopts the universal piano finge
 * **The 5-Finger Shell:** When a position marker like `C4 Pos` appears, the player instinctively rests their right hand over these 5 consecutive white keys using fingers 1 through 5.
 * **Relative vs. Absolute:** By prioritizing relative finger numbers (`1`-`5`) over absolute pitch letters (`C`-`D`-`E`), beginners can read melodies instantly without needing to think about notes on a page, and developers can program trivial transposition engines across the grid layout.
 
+### Sample JSON Song Layout
+
+```javascript
+{
+  "metadata": {
+    "title": "The Sample Standard Arrangement",
+    "composed_by": "Code Journey Software",
+    "key_instructions": "Play with a steady, explicit pop ballad rhythm in C Major. Note the 0-75 absolute indexing boundaries.",
+    "grid_columns_per_line": 76
+  },
+  "sections": [
+    {
+      "type": "Intro",
+      "lines": [
+        {
+          "type": "grid_line",
+          "hand_positions": [
+            { "position": "C4 Pos", "col": 0 }
+          ],
+          "chords": [
+            { "chord": "C", "col": 0 },
+            { "chord": "G", "col": 32 }
+          ],
+          "fingering": [
+            { "finger": "1", "col": 0 },
+            { "finger": "3", "col": 8 },
+            { "finger": "5", "col": 16 },
+            { "finger": "2", "col": 32 },
+            { "finger": "4", "col": 40 },
+            { "finger": "5", "col": 48 }
+          ],
+          "lyrics": [
+            [
+              { "text": "[Piano", "col": 0 },
+              { "text": "Intro", "col": 8 },
+              { "text": "Arpeggio]", "col": 16 }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Verse 1",
+      "lines": [
+        {
+          "type": "grid_line",
+          "chords": [
+            { "chord": "C", "col": 0 },
+            { "chord": "Am", "col": 32 },
+            { "chord": "F", "col": 56 }
+          ],
+          "fingering": [
+            { "finger": "1", "col": 0 },
+            { "finger": "2", "col": 8 },
+            { "finger": "3", "col": 16 },
+            { "finger": "1", "col": 32 },
+            { "finger": "3", "col": 40 },
+            { "finger": "4", "col": 56 },
+            { "finger": "5", "col": 64 }
+          ],
+          "lyrics": [
+            [
+              { "text": "This", "col": 0 },
+              { "text": "is", "col": 8 },
+              { "text": "a", "col": 16 },
+              { "text": "Verse,", "col": 32 },
+              { "text": "first", "col": 40 },
+              { "text": "verse", "col": 56 },
+              { "text": "here.", "col": 64 }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Chorus",
+      "lines": [
+        {
+          "type": "grid_line",
+          "hand_positions": [
+            { "position": "G4 Pos", "col": 0 }
+          ],
+          "chords": [
+            { "chord": "G", "col": 0 },
+            { "chord": "C", "col": 24 },
+            { "chord": "G", "col": 48 },
+            { "chord": "F", "col": 64 }
+          ],
+          "fingering": [
+            { "finger": "1", "col": 0 },
+            { "finger": "1", "col": 8 },
+            { "finger": "1", "col": 16 },
+            { "finger": "4", "col": 24 },
+            { "finger": "4", "col": 32 },
+            { "finger": "4", "col": 40 },
+            { "finger": "1", "col": 48 },
+            { "finger": "1", "col": 56 },
+            { "finger": "2", "col": 64 },
+            { "finger": "1", "col": 70 }
+          ],
+          "lyrics": [
+            [
+              { "text": "Cho-", "col": 0 },
+              { "text": "rus,", "col": 8 },
+              { "text": "Cho-", "col": 16 },
+              { "text": "rus,", "col": 24 },
+              { "text": "Cho-", "col": 32 },
+              { "text": "rus,", "col": 40 },
+              { "text": "this", "col": 48 },
+              { "text": "is", "col": 56 },
+              { "text": "Cho-", "col": 64 },
+              { "text": "rus.", "col": 70 }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Bridge",
+      "lines": [
+        {
+          "type": "grid_line",
+          "hand_positions": [
+            { "position": "C4 Pos", "col": 0 }
+          ],
+          "chords": [
+            { "chord": "Am", "col": 0 },
+            { "chord": "Em", "col": 24 },
+            { "chord": "F", "col": 48 },
+            { "chord": "G", "col": 64 }
+          ],
+          "fingering": [
+            { "finger": "1", "col": 0 },
+            { "finger": "2", "col": 8 },
+            { "finger": "3", "col": 16 },
+            { "finger": "1", "col": 24 },
+            { "finger": "3", "col": 32 },
+            { "finger": "4", "col": 48 },
+            { "finger": "5", "col": 56 },
+            { "finger": "5+", "col": 64 },
+            { "finger": "5", "col": 72 }
+          ],
+          "lyrics": [
+            [
+              { "text": "Bridge,", "col": 0 },
+              { "text": "this", "col": 8 },
+              { "text": "is", "col": 16 },
+              { "text": "a", "col": 24 },
+              { "text": "bridge,", "col": 32 },
+              { "text": "bridge,", "col": 48 },
+              { "text": "bridge,", "col": 56 },
+              { "text": "high", "col": 64 },
+              { "text": "note.", "col": 72 }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Tag",
+      "lines": [
+        {
+          "type": "grid_line",
+          "chords": [
+            { "chord": "F", "col": 0 },
+            { "chord": "G", "col": 32 }
+          ],
+          "fingering": [
+            { "finger": "4", "col": 0 },
+            { "finger": "4", "col": 12 },
+            { "finger": "5", "col": 32 },
+            { "finger": "5", "col": 44 }
+          ],
+          "lyrics": [
+            [
+              { "text": "Tag", "col": 0 },
+              { "text": "it,", "col": 12 },
+              { "text": "tag", "col": 32 },
+              { "text": "it.", "col": 44 }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Outro",
+      "lines": [
+        {
+          "type": "grid_line",
+          "chords": [
+            { "chord": "C", "col": 0 }
+          ],
+          "fingering": [
+            { "finger": "5", "col": 0 },
+            { "finger": "3", "col": 12 },
+            { "finger": "1", "col": 24 }
+          ],
+          "lyrics": [
+            [
+              { "text": "Out-", "col": 0 },
+              { "text": "ro", "col": 12 },
+              { "text": "ends.", "col": 24 }
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ## 🚀 Live Demo & Reference Implementation
