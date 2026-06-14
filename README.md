@@ -41,7 +41,7 @@ A complete piece of tablature is composed of repeating structural blocks. Each b
 ```text
 Position: 0--------10--------20--------30--------40--------50--------60--------75
                                                                                 
-[Hand Pos] C Pos                               G Pos                            
+[Hand Pos] C3 Pos                              G3 Pos                            
 [Chords]   C                                   G                                
 [Melody]   5---------5---------1---------1-----5---------5---------4----------- 
 [Lyrics]   Twinkle,  twinkle,  lit-  tle       star,     how   I   won-  der   
@@ -52,9 +52,24 @@ Position: 0--------10--------20--------30--------40--------50--------60--------7
 
 #### 1. Hand Position Row (`[Hand Pos]`)
 
-Because the piano utilizes the entire keyboard, the standard organizes rows around a **Home Base** or anchoring zone (e.g., `C Pos`, `G Pos`).
+Because a piano spans 88 keys, specifying a generic letter note is not enough—the standard must dictate exactly *where* on the keyboard the player should anchor their hand. We do this by appending the standard **Scientific Pitch Notation (SPN)** octave number directly to the anchor note.
 
-* When a pianist needs to shift smoothly up or down the keyboard, a **Cross** (thumb under or fingers over) is digitally represented by placing a new Hand Position marker exactly at the grid coordinate where the physical hand shift occurs.
+| Octave Number | Common Descriptive Name | Musical Character / Register |
+| :--- | :--- | :--- |
+| **Octaves 0 & 1** | Sub-Contra / Contra | The absolute lowest, rumbling bass notes. |
+| **Octave 2** | Great Octave | Deep bass notes (ideal for left-hand bass lines). |
+| **Octave 3** | Small Octave | Tenor range (just below Middle C). |
+| **Octave 4** | **Middle Octave** | **The center of the piano.** Contains **Middle C (C4)**. |
+| **Octave 5** | Two-Line Octave | Treble range (where standard vocal melodies sit). |
+| **Octave 6** | Three-Line Octave | High treble range (bright, piercing melodies). |
+| **Octaves 7 & 8** | High / Top Octave | The highest, tinny "crystal" notes on the far right. |
+
+* **Octave Anchoring Rules:**
+  * `C4 Pos` anchors the player's home base around Middle C.
+  * `G4 Pos` anchors the player around the G just above Middle C.
+  * Left-hand configurations can cleanly specify lower bass anchors like `C3 Pos` or `G2 Pos`.
+* **The "Default to 4" Rule:** To keep beginner tabs clean, a position written without a trailing integer (e.g., `C Pos`) implicitly defaults to Octave 4. Alternate octaves *must* explicitly append their number.
+* **Hand Shifts:** When a pianist needs to shift smoothly up or down the keyboard, a **Cross** (thumb under or fingers over) is digitally represented by placing a new Hand Position marker (e.g., shifting from `C4 Pos` to `G4 Pos`) exactly at the grid coordinate where the physical hand shift occurs.
 
 #### 2. Chord Tone Row (`[Chords]`)
 
