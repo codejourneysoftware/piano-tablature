@@ -89,6 +89,25 @@ Lyrics are bound directly to the matching visual coordinates of the musical grid
 
 ---
 
+## 🖐️ Hand Mechanics & Fingering Standard
+
+To keep text-based tabs intuitive, the standard adopts the universal piano fingering system for both hands. Below is the primary mapping standard for the **Right Hand (RH)** home base:
+
+| Finger Number | Anatomical Finger | Home Base Default Mapping (e.g., `C4 Pos`) |
+| :---: | :--- | :--- |
+| **1** | Thumb | **Root Position Anchor** (e.g., The `C4` key) |
+| **2** | Index Finger | +2 Semitones / Whole Step up (e.g., The `D4` key) |
+| **3** | Middle Finger | +4 Semitones / Major Third up (e.g., The `E4` key) |
+| **4** | Ring Finger | +5 Semitones / Perfect Fourth up (e.g., The `F4` key) |
+| **5** | Pinky | +7 Semitones / Perfect Fifth up (e.g., The `G4` key) |
+
+### 🧭 Interpretation Rules
+
+* **The 5-Finger Shell:** When a position marker like `C4 Pos` appears, the player instinctively rests their right hand over these 5 consecutive white keys using fingers 1 through 5.
+* **Relative vs. Absolute:** By prioritizing relative finger numbers (`1`-`5`) over absolute pitch letters (`C`-`D`-`E`), beginners can read melodies instantly without needing to think about notes on a page, and developers can program trivial transposition engines across the grid layout.
+
+---
+
 ## 🚀 Live Demo & Reference Implementation
 
 We are building a beautiful product ecosystem around this open-source standard, enabling features like instant interactive transpositions, fluid canvas printing options (`Manuscript` and `Studio Dark`), and local-first data processing.
@@ -106,6 +125,46 @@ We welcome contributions of all kinds! Whether you want to help refine the parsi
 3. Commit your changes (`git commit -m 'Add support for sustain pedal markers'`).
 4. Push to the branch (`git push origin feature/AmazingStandardImprovement`).
 5. Open a Pull Request.
+
+---
+
+---
+
+## 🚧 RFC: Outstanding Standards & Technical Proposals
+
+As an evolving open-source specification, we are actively looking for input on how to formally codify advanced physiological mechanics. We want to finalize an elegant, non-breaking text notation for **hand expansions/contractions** and **finger crossings**. 
+
+If you have expertise in music theory or pedagogical design, please jump into the issues to help define the syntax for these core movements:
+
+### 1. Lateral Hand Expansions & Contractions (Stretches)
+
+While the default standard maps a static 5-finger shell (a perfect fifth span), real-world pieces frequently require players to expand their web space or contract their hand frame to reach alternate intervals.
+
+| Movement Type | Classical Musical Context | Proposed Syntactical Notation |
+| :--- | :--- | :--- |
+| **Extension (Upward Stretch)** | Stretching the pinky or index to play an interval larger than a major third or fifth without shifting the wrist anchor. | Append `+` or `++` to the finger token (e.g., `5+` to extend the pinky out a whole step up). |
+| **Contraction (Compression)** | Narrowing the hand frame to play minor intervals or chromatic passing notes inside a tight layout window. | Append `-` or `--` to the finger token (e.g., `2-` to play a minor second inflected scale degree). |
+
+*   **The Design Dilemma:** How far can a finger extend before it forces a structural shift of the entire home base (position)? We are currently debating capping static extensions at a **Major 6th** or **Minor 7th** span before requiring a formal change in the `[Hand Pos]` row.
+
+### 2. Finger Crossings & Substitutions (Passages & Arpeggios)
+
+To execute fluid scalar runs (like a basic C Major scale), pianists rely on intricate finger crossings to reset their hand frame. However, typing descriptive text like `(thumb under)` inside the grid stretches the row out, breaking the absolute visual alignment with the chords and lyrics beneath it.
+
+Every space in the standard must represent a strict visual time coordinate. We are currently evaluating two compact, non-breaking layout proposals to handle crossings:
+
+#### Proposal A: The Inline Pivot Token (Single Character)
+This approach embeds a single-character geometric modifier immediately following the finger number, keeping the strict column width intact.
+
+* `3<` : **Thumb-Under Cross** (The thumb ducks under finger 3).
+* `1>` : **Finger-Over Cross** (A finger crosses back over the thumb).
+
+```text
+Position: 0--------10--------20--------30--------40--------50--------60--------75
+
+[Hand Pos] C4 Pos                     F4 Pos
+[Melody]   1---------2---------3<--------1---------2---------3---------4---------
+[Lyrics]   Joy       to        the       world,    the       Lord      is
 
 ---
 
