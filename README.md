@@ -6,6 +6,11 @@ Traditional sheet music is rich and expressive, but it comes with a steep learni
 
 ---
 
+## 🚀 Live Preview
+* See a live, interactive preview here: [Piano Tablature Sandbox](https://codejourneysoftware.github.io/piano-tablature/)
+
+---
+
 ## 🎯 Our Mission
 
 Currently, there is no universally established standard for text-based piano tabs. Most tabs found online are inconsistent, fragment across different screen sizes, and easily lose alignment.
