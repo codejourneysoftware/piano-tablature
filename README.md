@@ -323,8 +323,8 @@ To keep text-based tabs intuitive, the standard adopts the universal piano finge
 
 We are building a beautiful product ecosystem around this open-source standard, enabling features like instant interactive transpositions, fluid canvas printing options (`Manuscript` and `Studio Dark`), and local-first data processing.
 
-* 🌍 **Interactive Sandbox Web App:** [Code Journey Labs - Piano Tabs](https://www.google.com/search?q=https://www.codejourneysoftware.com/labs/pianotabs/pianotabs.html)
-
+* See a live, interactive preview here: [Piano Tablature Sandbox](https://codejourneysoftware.github.io/piano-tablature/)
+* 
 ---
 
 ## 🛠️ Contributing
